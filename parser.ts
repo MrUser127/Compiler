@@ -1,4 +1,4 @@
-import { Statement, Program, Expression, BinaryExpression, NumericLiteral, Identifier } from "./ast.ts";
+import { Statement, Program, Expression, BinaryExpression, NumericLiteral, Identifier, NullLiteral } from "./ast.ts";
 import { tokenize, Token, TokenType } from "./tokenizer.ts";
 
 export default class Parser {
@@ -71,6 +71,9 @@ export default class Parser {
         switch (token) {
             case TokenType.Identifier:
                 return { kind: "Identifier", symbol: this.getCurrentToken().value } as Identifier;
+            case TokenType.Null:
+                this.getCurrentToken();
+                return { kind: "NullLiteral", value: "null" } as NullLiteral;
             case TokenType.Number:
                 return { kind: "NumericLiteral", value: parseFloat(this.getCurrentToken().value) } as NumericLiteral;
             case TokenType.OpenParen:

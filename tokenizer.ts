@@ -4,6 +4,7 @@ export interface Token {
 }
 
 export enum TokenType {
+    Null,
     Number,
     Identifier,
     Equals,
@@ -14,7 +15,10 @@ export enum TokenType {
     EOF,
 }
 
-const keywordToTokenType = new Map<string, TokenType>([["let", TokenType.VariableDeclaration]]);
+const keywordToTokenType = new Map<string, TokenType>([
+    ["let", TokenType.VariableDeclaration],
+    ["null", TokenType.Null],
+]);
 
 function createToken(value = "", type: TokenType): Token {
     return { value, type };
@@ -64,7 +68,7 @@ export function tokenize(input: string): Token[] {
             }
 
             const keywordType = keywordToTokenType.get(identifier);
-            if (keywordType) {
+            if (typeof keywordType == "number") {
                 tokens.push(createToken(identifier, keywordType));
             } else {
                 tokens.push(createToken(identifier, TokenType.Identifier));
