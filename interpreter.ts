@@ -1,7 +1,8 @@
 import { NullValue, NumberValue, RuntimeValue, ValueType } from "./values.ts";
-import { NumericLiteral, Statement, BinaryExpression, Program } from "./ast.ts";
+import { NumericLiteral, Statement, BinaryExpression, Program, Identifier, VariableDeclaration } from "./ast.ts";
+import Environment from "./environment.ts";
 
-export function evaluate(astNode: Statement): RuntimeValue {
+export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch (astNode.kind) {
         case "NumericLiteral":
             return {
@@ -9,23 +10,35 @@ export function evaluate(astNode: Statement): RuntimeValue {
                 type: "number",
             } as NumberValue;
 
-        case "NullLiteral":
-            return { value: "null", type: "null" } as NullValue;
+        case "Identifier":
+            return evaluateIdentifier(astNode as Identifier, env);
 
         case "BinaryExpression":
-            return evaluateBinaryExpression(astNode as BinaryExpression);
+            return evaluateBinaryExpression(astNode as BinaryExpression, env);
 
         case "Program":
-            return evaluateProgram(astNode as Program);
+            return evaluateProgram(astNode as Program, env);
+
+        case "VariableDeclaration":
+            return evaluateVariableDeclaration(astNode as VariableDeclaration, env);
 
         default:
-            throw new Error("Unknown AST node");
+            throw new Error("Unknown AST node: " + astNode);
     }
 }
 
-function evaluateBinaryExpression(expression: BinaryExpression): RuntimeValue {
-    const lhs = evaluate(expression.left);
-    const rhs = evaluate(expression.right);
+function evaluateVariableDeclaration(declaration: VariableDeclaration, env: Environment): RuntimeValue {
+    const value = declaration.value ? evaluate(declaration.value, env) : ({ type: "null", value: "null" } as NullValue);
+    return env.declareVar(declaration.identifier, value, declaration.constant);
+}
+
+function evaluateIdentifier(identifier: Identifier, env: Environment): RuntimeValue {
+    return env.lookupVar(identifier.symbol);
+}
+
+function evaluateBinaryExpression(expression: BinaryExpression, env: Environment): RuntimeValue {
+    const lhs = evaluate(expression.left, env);
+    const rhs = evaluate(expression.right, env);
 
     if (lhs.type == "number" && rhs.type == "number") {
         return evaluateNumericBinaryExpression(lhs as NumberValue, rhs as NumberValue, expression.operator);
@@ -54,11 +67,11 @@ function evaluateNumericBinaryExpression(lhs: NumberValue, rhs: NumberValue, ope
     return { value: result, type: "number" };
 }
 
-function evaluateProgram(program: Program): RuntimeValue {
+function evaluateProgram(program: Program, env: Environment): RuntimeValue {
     let lastEvaluated: RuntimeValue = { type: "null", value: "null" } as NullValue;
 
     for (let statement of program.body) {
-        lastEvaluated = evaluate(statement);
+        lastEvaluated = evaluate(statement, env);
     }
 
     return lastEvaluated;

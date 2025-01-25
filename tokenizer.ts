@@ -4,20 +4,22 @@ export interface Token {
 }
 
 export enum TokenType {
-    Null,
     Number,
+    String,
     Identifier,
     Equals,
     BinaryOperator,
     VariableDeclaration,
+    Const,
     OpenParen,
     CloseParen,
+    Semicolon,
     EOF,
 }
 
 const keywordToTokenType = new Map<string, TokenType>([
     ["let", TokenType.VariableDeclaration],
-    ["null", TokenType.Null],
+    ["const", TokenType.Const],
 ]);
 
 function createToken(value = "", type: TokenType): Token {
@@ -61,6 +63,8 @@ export function tokenize(input: string): Token[] {
             tokens.push(createToken(number, TokenType.Number));
         } else if (currentInput[0] == "=") {
             tokens.push(createToken(currentInput.shift(), TokenType.Equals));
+        } else if (currentInput[0] == ";") {
+            tokens.push(createToken(currentInput.shift(), TokenType.Semicolon));
         } else if (isAlphabetic(currentInput[0])) {
             let identifier = "";
             while (currentInput.length > 0 && isAlphabetic(currentInput[0])) {
