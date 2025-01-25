@@ -11,6 +11,7 @@ export enum TokenType {
     VariableDeclaration,
     OpenParen,
     CloseParen,
+    EOF,
 }
 
 const keywordToTokenType = new Map<string, TokenType>([["let", TokenType.VariableDeclaration]]);
@@ -69,5 +70,6 @@ export function tokenize(input: string): Token[] {
         }
     }
 
+    tokens.push(createToken("", TokenType.EOF));
     return tokens;
 }
