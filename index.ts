@@ -1,7 +1,22 @@
-import { tokenize } from "./tokenizer.ts";
+import Parser from "./parser.ts";
 
-const tokens = tokenize("let something = 1 + (2 * 3)");
+repl();
 
-for (const token of tokens) {
-    console.log(token);
+async function repl() {
+    const parser = new Parser();
+
+    while (true) {
+        const input = prompt("> ");
+
+        if (!input || input.includes("exit")) {
+            return;
+        }
+
+        try {
+            const ast = parser.buildAST(input);
+            console.log(ast);
+        } catch (e) {
+            console.error(e);
+        }
+    }
 }

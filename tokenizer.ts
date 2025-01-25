@@ -41,7 +41,13 @@ export function tokenize(input: string): Token[] {
             tokens.push(createToken(currentInput.shift(), TokenType.OpenParen));
         } else if (currentInput[0] === ")") {
             tokens.push(createToken(currentInput.shift(), TokenType.CloseParen));
-        } else if (currentInput[0] === "+" || currentInput[0] === "-" || currentInput[0] === "*" || currentInput[0] === "/") {
+        } else if (
+            currentInput[0] === "+" ||
+            currentInput[0] === "-" ||
+            currentInput[0] === "*" ||
+            currentInput[0] === "/" ||
+            currentInput[0] === "%"
+        ) {
             tokens.push(createToken(currentInput.shift(), TokenType.BinaryOperator));
         } else if (isNumber(currentInput[0])) {
             let number = "";
