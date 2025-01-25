@@ -15,7 +15,6 @@ export enum TokenType {
 
 const keywordToTokenType = new Map<string, TokenType>([["let", TokenType.VariableDeclaration]]);
 
-// 'value' needs default value because .shift() can return undefined
 function createToken(value = "", type: TokenType): Token {
     return { value, type };
 }
