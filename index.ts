@@ -1,4 +1,5 @@
 import Parser from "./parser.ts";
+import { evaluate } from "./interpreter.ts";
 
 repl();
 
@@ -14,7 +15,8 @@ async function repl() {
 
         try {
             const ast = parser.buildAST(input);
-            console.log(ast);
+            const result = evaluate(ast);
+            console.log(result);
         } catch (e) {
             console.error(e);
         }
