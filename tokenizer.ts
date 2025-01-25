@@ -7,23 +7,13 @@ export enum TokenType {
     Number,
     Identifier,
     Equals,
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
+    BinaryOperator,
     VariableDeclaration,
     OpenParen,
     CloseParen,
 }
 
-const keywordToTokenType = new Map<string, TokenType>([
-    ["skibidi", TokenType.VariableDeclaration],
-    ["chat", TokenType.Equals],
-    ["chill", TokenType.Add],
-    ["gyat", TokenType.Subtract],
-    ["rizz", TokenType.Multiply],
-    ["bruh", TokenType.Divide],
-]);
+const keywordToTokenType = new Map<string, TokenType>([["let", TokenType.VariableDeclaration]]);
 
 // 'value' needs default value because .shift() can return undefined
 function createToken(value = "", type: TokenType): Token {
@@ -51,12 +41,16 @@ export function tokenize(input: string): Token[] {
             tokens.push(createToken(currentInput.shift(), TokenType.OpenParen));
         } else if (currentInput[0] === ")") {
             tokens.push(createToken(currentInput.shift(), TokenType.CloseParen));
+        } else if (currentInput[0] === "+" || currentInput[0] === "-" || currentInput[0] === "*" || currentInput[0] === "/") {
+            tokens.push(createToken(currentInput.shift(), TokenType.BinaryOperator));
         } else if (isNumber(currentInput[0])) {
             let number = "";
             while (currentInput.length > 0 && isNumber(currentInput[0])) {
                 number += currentInput.shift();
             }
             tokens.push(createToken(number, TokenType.Number));
+        } else if (currentInput[0] == "=") {
+            tokens.push(createToken(currentInput.shift(), TokenType.Equals));
         } else if (isAlphabetic(currentInput[0])) {
             let identifier = "";
             while (currentInput.length > 0 && isAlphabetic(currentInput[0])) {
