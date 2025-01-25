@@ -1,4 +1,13 @@
-import { Statement, Program, Expression, BinaryExpression, NumericLiteral, Identifier, VariableDeclaration } from "./ast.ts";
+import {
+    Statement,
+    Program,
+    Expression,
+    BinaryExpression,
+    NumericLiteral,
+    Identifier,
+    VariableDeclaration,
+    AssignmentExpression,
+} from "./ast.ts";
 import { tokenize, Token, TokenType } from "./tokenizer.ts";
 
 export default class Parser {
@@ -74,7 +83,19 @@ export default class Parser {
     }
 
     private parseExpression(): Expression {
-        return this.parseAdditiveExpression();
+        return this.parseAssignmentExpression();
+    }
+
+    private parseAssignmentExpression(): Expression {
+        const left = this.parseAdditiveExpression();
+
+        if (this.tokens[0].type === TokenType.Equals) {
+            this.getCurrentToken();
+            const value = this.parseAssignmentExpression();
+            return { value, assigne: left, kind: "AssignmentExpression" } as AssignmentExpression;
+        }
+
+        return left;
     }
 
     private parseAdditiveExpression(): Expression {
